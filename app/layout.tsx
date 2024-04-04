@@ -1,6 +1,11 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import { ClerkProvider, auth } from "@clerk/nextjs"
+import NextTopLoader from "nextjs-toploader"
+import GlobalStyleProvider from "@/providers/GlobalStyleProvider"
+import ContextProvider from "@/providers/ContextProvider"
+import Sidebar from "@/components/Sidebar"
+import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,9 +19,32 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { userId } = auth()
+
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+        <body className={inter.className}>
+          <NextTopLoader
+            height={2}
+            color="#27AE60"
+            easing="cubic-bezier(0.53,0.21,0,1)"
+          />
+          <ContextProvider>
+            <GlobalStyleProvider>
+              {userId && <Sidebar />}
+              <div className="w-full">{children}</div>
+            </GlobalStyleProvider>
+          </ContextProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
